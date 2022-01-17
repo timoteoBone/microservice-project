@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "github.com/timoteoBone/project-microservice/grpcService/pkg/pb"
+	pb "github.com/timoteoBone/microservice-project/grpcService/pkg/pb"
 )
 
 type UserNotFoundErr struct {

@@ -1,6 +1,6 @@
 package mapper
 
-import "github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
+import "github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
 
 func CreateUserRequestToUser(userReq entities.CreateUserRequest) entities.User {
 

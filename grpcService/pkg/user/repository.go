@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	entities "github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/utils"
+	entities "github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/utils"
 )
 
 type sqlRepo struct {

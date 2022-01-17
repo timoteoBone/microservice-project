@@ -5,9 +5,9 @@ import (
 
 	gr "github.com/go-kit/kit/transport/grpc"
 
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	customErr "github.com/timoteoBone/project-microservice/grpcService/pkg/errors"
-	proto "github.com/timoteoBone/project-microservice/grpcService/pkg/pb"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	customErr "github.com/timoteoBone/microservice-project/grpcService/pkg/errors"
+	proto "github.com/timoteoBone/microservice-project/grpcService/pkg/pb"
 )
 
 type gRPCSv struct {

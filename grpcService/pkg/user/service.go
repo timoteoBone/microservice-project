@@ -9,9 +9,9 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/google/uuid"
 
-	entities "github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	errors "github.com/timoteoBone/project-microservice/grpcService/pkg/errors"
-	mapper "github.com/timoteoBone/project-microservice/grpcService/pkg/mapper"
+	entities "github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	errors "github.com/timoteoBone/microservice-project/grpcService/pkg/errors"
+	mapper "github.com/timoteoBone/microservice-project/grpcService/pkg/mapper"
 )
 
 type Repository interface {

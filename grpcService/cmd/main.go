@@ -17,8 +17,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "github.com/timoteoBone/project-microservice/grpcService/pkg/pb"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/user"
+	pb "github.com/timoteoBone/microservice-project/grpcService/pkg/pb"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/user"
 )
 
 func main() {

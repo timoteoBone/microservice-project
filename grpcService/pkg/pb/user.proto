@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/timoteoBone/project-microservice/grpcService;grpc_service";
+option go_package = "github.com/timoteoBone/microservice-project/grpcService;grpc_service";
 
 package proto;
 

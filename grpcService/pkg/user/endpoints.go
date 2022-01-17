@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
 )
 
 type Service interface {
