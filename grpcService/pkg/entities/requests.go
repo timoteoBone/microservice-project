@@ -37,3 +37,11 @@ type AuthenticateRequest struct {
 type AuthenticateResponse struct {
 	Status Status
 }
+
+type DeleteUserRequest struct {
+	UserId string
+}
+
+type DeleteUserResponse struct {
+	Status Status
+}

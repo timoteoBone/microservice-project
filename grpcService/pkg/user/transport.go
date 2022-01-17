@@ -13,7 +13,7 @@ import (
 type gRPCSv struct {
 	createUs gr.Handler
 	getUs    gr.Handler
-	authUs   gr.Handler
+	deleteUs gr.Handler
 	proto.UnimplementedUserServiceServer
 }
 
@@ -30,6 +30,12 @@ func NewGrpcServer(end Endpoints) proto.UserServiceServer {
 			end.GetUser,
 			decodeGetUserRequest,
 			encodeGetUserResponse,
+		),
+
+		deleteUs: gr.NewServer(
+			end.DeleteUser,
+			decodeDeleteUserRequest,
+			encodeDeleteUserRequest,
 		),
 	}
 }
@@ -54,6 +60,15 @@ func (g *gRPCSv) GetUser(ctx context.Context, rq *proto.GetUserRequest) (rs *pro
 	}
 
 	return resp.(*proto.GetUserResponse), nil
+}
+
+func (g *gRPCSv) DeleteUser(ctx context.Context, rq *proto.DeleteUserRequest) (*proto.DeleteUserResponse, error) {
+	_, resp, err := g.deleteUs.ServeGRPC(ctx, rq)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*proto.DeleteUserResponse), nil
 }
 
 func decodeCreateUserRequest(ctx context.Context, request interface{}) (interface{}, error) {
@@ -94,5 +109,22 @@ func decodeGetUserRequest(ctx context.Context, request interface{}) (interface{}
 func encodeGetUserResponse(ctx context.Context, response interface{}) (interface{}, error) {
 	res := response.(entities.GetUserResponse)
 	protoResp := &proto.GetUserResponse{Id: res.Id, Name: res.Name, Age: res.Age}
+	return protoResp, nil
+}
+
+func decodeDeleteUserRequest(ctx context.Context, request interface{}) (interface{}, error) {
+	res, valid := request.(entities.DeleteUserRequest)
+	if !valid {
+		return nil, customErr.NewGrpcError()
+	}
+
+	return entities.DeleteUserRequest{
+		UserId: res.UserId,
+	}, nil
+}
+
+func encodeDeleteUserRequest(ctx context.Context, response interface{}) (interface{}, error) {
+	resp := response.(entities.DeleteUserResponse)
+	protoResp := &proto.DeleteUserResponse{Status: &proto.Status{Message: resp.Status.Message, Code: resp.Status.Code}}
 	return protoResp, nil
 }

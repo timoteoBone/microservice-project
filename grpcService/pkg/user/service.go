@@ -17,6 +17,7 @@ import (
 type Repository interface {
 	GetUser(ctx context.Context, userId string) (entities.User, error)
 	CreateUser(ctx context.Context, user entities.User, newId string) (string, error)
+	DeleteUser(ctx context.Context, userId string) error
 }
 
 type service struct {
@@ -29,7 +30,7 @@ func NewService(l log.Logger, r Repository) *service {
 }
 
 func (s *service) CreateUser(ctx context.Context, userReq entities.CreateUserRequest) (entities.CreateUserResponse, error) {
-	s.Logger.Log(s.Logger, "request", "create user", "recevied")
+	s.Logger.Log(s.Logger, "request", "create user", "received")
 
 	response := entities.CreateUserResponse{}
 	status := entities.Status{}
@@ -54,7 +55,7 @@ func (s *service) CreateUser(ctx context.Context, userReq entities.CreateUserReq
 }
 
 func (s *service) GetUser(ctx context.Context, user entities.GetUserRequest) (entities.GetUserResponse, error) {
-	s.Logger.Log(s.Logger, "request", "get user", "recevied")
+	s.Logger.Log(s.Logger, "request", "get user", "received")
 
 	res, err := s.Repo.GetUser(ctx, user.UserID)
 	if err != nil {
@@ -63,7 +64,7 @@ func (s *service) GetUser(ctx context.Context, user entities.GetUserRequest) (en
 			return entities.GetUserResponse{}, errors.NewUserNotFound()
 		}
 		level.Error(s.Logger).Log("error", err)
-		return entities.GetUserResponse{}, err
+		return entities.GetUserResponse{}, errors.NewDataBaseError()
 	}
 
 	response := entities.GetUserResponse{
@@ -73,6 +74,29 @@ func (s *service) GetUser(ctx context.Context, user entities.GetUserRequest) (en
 	}
 
 	return response, nil
+}
+
+func (s *service) DeleteUser(ctx context.Context, rq entities.DeleteUserRequest) (entities.DeleteUserResponse, error) {
+	s.Logger.Log(s.Logger, "delete user", "recevied")
+
+	userId := rq.UserId
+
+	err := s.Repo.DeleteUser(ctx, userId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			level.Error(s.Logger).Log("error", err)
+			return entities.DeleteUserResponse{}, errors.NewUserNotFound()
+		}
+		level.Error(s.Logger).Log("error", err)
+		return entities.DeleteUserResponse{}, errors.NewDataBaseError()
+	}
+
+	return entities.DeleteUserResponse{
+		Status: entities.Status{
+			Message: "User deleted succesfully",
+			Code:    0,
+		},
+	}, nil
 }
 
 func generateId() string {

@@ -43,6 +43,12 @@ func (repo *RepoSitoryMock) GetUser(ctx context.Context, userId string) (entitie
 
 }
 
+func (repo *RepoSitoryMock) DeleteUser(ctx context.Context, userId string) error {
+	args := repo.Called(ctx, userId)
+
+	return args.Error(0)
+}
+
 func (repo *RepoSitoryMock) AuthenticateUser(ctx context.Context, email string) (string, error) {
 	return "nil", nil
 }

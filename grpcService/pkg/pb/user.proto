@@ -41,8 +41,16 @@ message GetUserResponse{
     Status status = 6;
 }
 
+message DeleteUserRequest{
+    string User_Id = 1;
+}
+
+message DeleteUserResponse{
+    Status Status = 1;
+}
 
 service UserService{
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse){}
     rpc GetUser(GetUserRequest) returns (GetUserResponse){}
+    rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse){}
 }

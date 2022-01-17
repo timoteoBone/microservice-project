@@ -42,6 +42,7 @@ func (repo *sqlRepo) CreateUser(ctx context.Context, user entities.User, newId s
 }
 
 func (repo *sqlRepo) GetUser(ctx context.Context, userId string) (entities.User, error) {
+	repo.Logger.Log(repo.Logger, "Repository method", "Get user")
 
 	user := entities.User{}
 	stmt, err := repo.DB.PrepareContext(ctx, utils.GetUserQuery)
@@ -59,4 +60,25 @@ func (repo *sqlRepo) GetUser(ctx context.Context, userId string) (entities.User,
 	}
 
 	return user, nil
+}
+
+func (repo *sqlRepo) DeleteUser(ctx context.Context, userId string) error {
+	repo.Logger.Log(repo.Logger, "Repository method", "Create user")
+
+	stmt, err := repo.DB.PrepareContext(ctx, utils.DeleteUserQuery)
+	if err != nil {
+		level.Error(repo.Logger).Log(err)
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, userId)
+	if err != nil {
+		level.Error(repo.Logger).Log(err)
+		return err
+	}
+
+	return nil
+
 }

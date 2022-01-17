@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"database/sql"
 	"os"
 	"testing"
 
@@ -175,6 +176,69 @@ func TestGetUser(t *testing.T) {
 
 			res, err := repo.GetUser(ctx, tc.UserID)
 			tc.assertResponse(t, res, err)
+		})
+	}
+
+}
+
+func TestDeleteUser(t *testing.T) {
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewSyncLogger(logger)
+		logger = log.With(logger,
+			"service", "grpcUserService",
+			"time:", log.DefaultTimestampUTC,
+			"caller", log.DefaultCaller,
+		)
+	}
+
+	db, mock := utils.NewMock(logger)
+	defer db.Close()
+
+	userId := utils.GenerateId()
+
+	repo := user.NewSQL(db, logger)
+
+	testCases := []struct {
+		Name           string
+		UserID         string
+		buildMock      func(mock sqlmock.Sqlmock, userId string)
+		assertResponse func(t *testing.T, err error)
+	}{
+		{
+			Name:   "Delete Existing User",
+			UserID: userId,
+			buildMock: func(mock sqlmock.Sqlmock, userId string) {
+				mock.ExpectPrepare(utils.DeleteUserQuery)
+				mock.ExpectExec(utils.DeleteUserQuery).WithArgs(userId).WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			assertResponse: func(t *testing.T, err error) {
+				assert.Nil(t, err)
+			},
+		},
+
+		{
+			Name:   "Delete non existing user",
+			UserID: userId,
+			buildMock: func(mock sqlmock.Sqlmock, userId string) {
+				mock.ExpectPrepare(utils.DeleteUserQuery)
+				mock.ExpectExec(utils.DeleteUserQuery).WithArgs(userId).WillReturnError(sql.ErrNoRows)
+			},
+			assertResponse: func(t *testing.T, err error) {
+				assert.ErrorIs(t, sql.ErrNoRows, err)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+
+		t.Run(tc.Name, func(t *testing.T) {
+			ctx := context.Background()
+			tc.buildMock(mock, userId)
+
+			err := repo.DeleteUser(ctx, tc.UserID)
+			tc.assertResponse(t, err)
 		})
 	}
 

@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"os"
 	"testing"
@@ -192,11 +193,78 @@ func TestServiceGetNonExistingUser(t *testing.T) {
 	srvc := service.NewService(logger, repo)
 	ctx := context.Background()
 
-	repo.Mock.On("GetUser", ctx, userId).Return(entities.User{}, expectedErr)
+	repo.Mock.On("GetUser", ctx, userId).Return(entities.User{}, sql.ErrNoRows)
 
 	res, err := srvc.GetUser(ctx, correctGetUserRequest)
 	assert.Equal(t, entities.GetUserResponse{}, res)
-	assert.ErrorIs(t, err, expectedErr)
+	assert.Equal(t, err.Error(), expectedErr.Error())
+
+}
+
+func TestDeleteExistingUser(t *testing.T) {
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewSyncLogger(logger)
+		logger = log.With(logger,
+			"service", "grpcUserService",
+			"time:", log.DefaultTimestampUTC,
+			"caller", log.DefaultCaller,
+		)
+	}
+
+	userId := utils.GenerateId()
+
+	correctDeleteUserRequest := entities.DeleteUserRequest{
+		UserId: userId,
+	}
+
+	succesfullDeleteUserRequest := entities.DeleteUserResponse{
+		Status: entities.Status{
+			Message: "User deleted succesfully",
+			Code:    0,
+		},
+	}
+
+	repo := new(utils.RepoSitoryMock)
+	srvc := service.NewService(logger, repo)
+
+	ctx := context.Background()
+	repo.Mock.On("DeleteUser", ctx, userId).Return(nil)
+
+	res, err := srvc.DeleteUser(ctx, correctDeleteUserRequest)
+	assert.Equal(t, succesfullDeleteUserRequest, res)
+	assert.NoError(t, err)
+
+}
+
+func TestDeleteNonExistingUser(t *testing.T) {
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewSyncLogger(logger)
+		logger = log.With(logger,
+			"service", "grpcUserService",
+			"time:", log.DefaultTimestampUTC,
+			"caller", log.DefaultCaller,
+		)
+	}
+
+	userId := utils.GenerateId()
+
+	correctDeleteUserRequest := entities.DeleteUserRequest{
+		UserId: userId,
+	}
+
+	repo := new(utils.RepoSitoryMock)
+	srvc := service.NewService(logger, repo)
+
+	ctx := context.Background()
+	repo.Mock.On("DeleteUser", ctx, userId).Return(sql.ErrNoRows)
+
+	res, err := srvc.DeleteUser(ctx, correctDeleteUserRequest)
+	assert.Empty(t, res)
+	assert.Equal(t, err.Error(), myErr.NewUserNotFound().Error())
 
 }
 
