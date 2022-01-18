@@ -7,10 +7,10 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/stretchr/testify/assert"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	errors "github.com/timoteoBone/project-microservice/grpcService/pkg/errors"
-	"github.com/timoteoBone/project-microservice/httpService/pkg/user"
-	util "github.com/timoteoBone/project-microservice/httpService/pkg/utils"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	errors "github.com/timoteoBone/microservice-project/grpcService/pkg/errors"
+	"github.com/timoteoBone/microservice-project/httpService/pkg/user"
+	util "github.com/timoteoBone/microservice-project/httpService/pkg/utils"
 )
 
 func TestNewService(t *testing.T) {

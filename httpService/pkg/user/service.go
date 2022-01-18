@@ -5,13 +5,14 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	util "github.com/timoteoBone/project-microservice/httpService/pkg/utils"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	util "github.com/timoteoBone/microservice-project/httpService/pkg/utils"
 )
 
 type Repository interface {
 	CreateUser(ctx context.Context, rq entities.CreateUserRequest) (entities.CreateUserResponse, error)
 	GetUser(ctx context.Context, rq entities.GetUserRequest) (entities.GetUserResponse, error)
+	DeleteUser(ctx context.Context, rq entities.DeleteUserRequest) (entities.DeleteUserResponse, error)
 }
 
 type service struct {
@@ -52,7 +53,6 @@ func (s *service) CreateUser(ctx context.Context, rq entities.CreateUserRequest)
 
 func (s *service) GetUser(ctx context.Context, rq entities.GetUserRequest) (entities.GetUserResponse, error) {
 	logger := log.With(s.Logger, "get user request", "recevied")
-
 	if err := util.ValidateGetUserRequest(rq); err != nil {
 		level.Error(logger).Log("error", err)
 		return entities.GetUserResponse{}, err
@@ -65,4 +65,11 @@ func (s *service) GetUser(ctx context.Context, rq entities.GetUserRequest) (enti
 	}
 
 	return res, nil
+}
+
+func (s *service) DeleteUser(ctx context.Context, rq entities.DeleteUserRequest) (entities.DeleteUserResponse, error) {
+	logger := log.With(s.Logger, "delete user request", "recevied")
+
+	res, err := s.Repo
+
 }

@@ -1,8 +1,8 @@
 package util
 
 import (
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	proto "github.com/timoteoBone/project-microservice/grpcService/pkg/pb"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	proto "github.com/timoteoBone/microservice-project/grpcService/pkg/pb"
 )
 
 func CreateToProto(req entities.CreateUserRequest) *proto.CreateUserRequest {

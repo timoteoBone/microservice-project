@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/stretchr/testify/mock"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
 )
 
 type RepositoryMock struct {
