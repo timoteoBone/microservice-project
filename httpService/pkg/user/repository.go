@@ -68,7 +68,7 @@ func (repo *grpcClient) DeleteUser(ctx context.Context, rq entities.DeleteUserRe
 	resp, err := client.DeleteUser(protoReq)
 	if err != nil {
 		level.Error(logger).Log(err)
-		return entities.DeleteUserResponse, err
+		return entities.DeleteUserResponse{}, err
 	}
 
 	ret := util.DeleteFromProto(resp)

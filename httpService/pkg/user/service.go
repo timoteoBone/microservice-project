@@ -70,6 +70,12 @@ func (s *service) GetUser(ctx context.Context, rq entities.GetUserRequest) (enti
 func (s *service) DeleteUser(ctx context.Context, rq entities.DeleteUserRequest) (entities.DeleteUserResponse, error) {
 	logger := log.With(s.Logger, "delete user request", "recevied")
 
-	res, err := s.Repo
+	res, err := s.Repo.DeleteUser(ctx, rq)
+	if err != nil {
+		level.Error(logger).Log(err)
+		return entities.DeleteUserResponse{}, nil
+	}
+
+	return res, nil
 
 }

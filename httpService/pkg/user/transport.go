@@ -3,14 +3,11 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 
-	"discordbot/main.go/go/pkg/mod/github.com/gorilla/mux@v1.8.0"
-
 	"github.com/gorilla/mux"
+
 	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
-	"github.com/timoteoBone/microservice-project/grpcService/pkg/errors"
 	myerr "github.com/timoteoBone/microservice-project/grpcService/pkg/errors"
 
 	"github.com/go-kit/kit/log"
@@ -43,7 +40,7 @@ func NewHTTPSrv(endpoint Endpoints, logger log.Logger) http.Handler {
 		endpoint.DeleteUs,
 		decodeDeleteRequest,
 		encodeDeleteUserResponse,
-		options,
+		options...,
 	))
 	return rt
 }
@@ -81,14 +78,14 @@ func encodeGetUserResp(ctx context.Context, wr http.ResponseWriter, response int
 }
 
 func decodeDeleteRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	//missing variable for the request
+	var request entities.DeleteUserRequest
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 	if !ok {
-		//return nil, myerr.NewFieldsMissing()
+		return nil, myerr.NewFieldsMissing()
 	}
-	//assign id to request
-	return nil, errors.New("missing implementation")
+	request.UserId = id
+	return request, nil
 }
 
 func encodeDeleteUserResponse(ctx context.Context, r http.ResponseWriter, response interface{}) error {
@@ -97,7 +94,7 @@ func encodeDeleteUserResponse(ctx context.Context, r http.ResponseWriter, respon
 
 func encodeErrorResponse(_ context.Context, err error, w http.ResponseWriter) {
 	if err != nil {
-		w.WriteHeader(errors.CustomToHttp(err))
+		w.WriteHeader(myerr.CustomToHttp(err))
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"error": err.Error(),
 		})

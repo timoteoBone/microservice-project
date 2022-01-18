@@ -11,6 +11,7 @@ import (
 type Service interface {
 	CreateUser(ctx context.Context, rq entities.CreateUserRequest) (entities.CreateUserResponse, error)
 	GetUser(ctx context.Context, rq entities.GetUserRequest) (entities.GetUserResponse, error)
+	DeleteUser(ctx context.Context, rq entities.DeleteUserRequest) (entities.DeleteUserResponse, error)
 }
 
 type Endpoints struct {
@@ -69,7 +70,7 @@ func MakeDeleteUserEndpoint(s Service) endpoint.Endpoint {
 			return nil, errs.NewFieldsMissing()
 		}
 
-		res, err := s.GetUser(ctx, request)
+		res, err := s.DeleteUser(ctx, request)
 		if err != nil {
 			return nil, err
 		}
