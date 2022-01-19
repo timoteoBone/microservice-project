@@ -1,10 +1,10 @@
 package util
 
 import (
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/errors"
-	err "github.com/timoteoBone/project-microservice/grpcService/pkg/errors"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/errors"
+	err "github.com/timoteoBone/microservice-project/grpcService/pkg/errors"
 
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
 )
 
 func ValidateCreateUserRequest(user entities.CreateUserRequest) error {

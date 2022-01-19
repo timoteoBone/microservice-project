@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/timoteoBone/project-microservice/httpService/pkg/user"
+	"github.com/timoteoBone/microservice-project/httpService/pkg/user"
 
 	"google.golang.org/grpc"
 )

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/stretchr/testify/mock"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
 )
 
 type RepositoryMock struct {
@@ -29,4 +29,11 @@ func (repo *RepositoryMock) GetUser(ctx context.Context, rq entities.GetUserRequ
 
 	return response.(entities.GetUserResponse), args.Error(1)
 
+}
+
+func (repo *RepositoryMock) DeleteUser(ctx context.Context, rq entities.DeleteUserRequest) (entities.DeleteUserResponse, error) {
+	args := repo.Mock.Called(ctx, rq)
+	response := args[0]
+
+	return response.(entities.DeleteUserResponse), args.Error(1)
 }

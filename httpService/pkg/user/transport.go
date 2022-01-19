@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/errors"
-	myerr "github.com/timoteoBone/project-microservice/grpcService/pkg/errors"
+
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	myerr "github.com/timoteoBone/microservice-project/grpcService/pkg/errors"
 
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -36,6 +36,12 @@ func NewHTTPSrv(endpoint Endpoints, logger log.Logger) http.Handler {
 		options...,
 	))
 
+	rt.Methods("DELETE").Path("/user/{id}").Handler(httptransport.NewServer(
+		endpoint.DeleteUs,
+		decodeDeleteRequest,
+		encodeDeleteUserResponse,
+		options...,
+	))
 	return rt
 }
 
@@ -67,13 +73,27 @@ func decodeGetUserReq(ctx context.Context, r *http.Request) (interface{}, error)
 }
 
 func encodeGetUserResp(ctx context.Context, wr http.ResponseWriter, response interface{}) error {
-
 	return json.NewEncoder(wr).Encode(response)
+}
+
+func decodeDeleteRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var request entities.DeleteUserRequest
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return nil, myerr.NewFieldsMissing()
+	}
+	request.UserId = id
+	return request, nil
+}
+
+func encodeDeleteUserResponse(ctx context.Context, r http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(r).Encode(response)
 }
 
 func encodeErrorResponse(_ context.Context, err error, w http.ResponseWriter) {
 	if err != nil {
-		w.WriteHeader(errors.CustomToHttp(err))
+		w.WriteHeader(myerr.CustomToHttp(err))
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"error": err.Error(),
 		})

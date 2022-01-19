@@ -44,9 +44,8 @@ func (g *gRPCSv) CreateUser(ctx context.Context, rq *proto.CreateUserRequest) (r
 	_, resp, err := g.createUs.ServeGRPC(ctx, rq)
 
 	if err != nil {
-		status := customErr.CustomToGrpc(err)
-		resp := proto.CreateUserResponse{Status: status}
-		return &resp, err
+
+		return nil, err
 	}
 
 	return resp.(*proto.CreateUserResponse), nil
@@ -79,9 +78,10 @@ func decodeCreateUserRequest(ctx context.Context, request interface{}) (interfac
 	}
 
 	return entities.CreateUserRequest{
-		Name: res.Name,
-		Age:  res.Age,
-		Pass: res.Pass,
+		Name:  res.Name,
+		Age:   res.Age,
+		Pass:  res.Pass,
+		Email: res.Email,
 	}, nil
 
 }
@@ -107,19 +107,22 @@ func decodeGetUserRequest(ctx context.Context, request interface{}) (interface{}
 }
 
 func encodeGetUserResponse(ctx context.Context, response interface{}) (interface{}, error) {
-	res := response.(entities.GetUserResponse)
+	res, valid := response.(entities.GetUserResponse)
+	if !valid {
+		return nil, customErr.NewGrpcError()
+	}
 	protoResp := &proto.GetUserResponse{Id: res.Id, Name: res.Name, Age: res.Age}
 	return protoResp, nil
 }
 
 func decodeDeleteUserRequest(ctx context.Context, request interface{}) (interface{}, error) {
-	res, valid := request.(entities.DeleteUserRequest)
+	res, valid := request.(*proto.DeleteUserRequest)
 	if !valid {
 		return nil, customErr.NewGrpcError()
 	}
 
 	return entities.DeleteUserRequest{
-		UserId: res.UserId,
+		UserId: res.User_Id,
 	}, nil
 }
 

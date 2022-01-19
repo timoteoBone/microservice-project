@@ -5,10 +5,10 @@ import (
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	util "github.com/timoteoBone/project-microservice/httpService/pkg/utils"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	util "github.com/timoteoBone/microservice-project/httpService/pkg/utils"
 
-	proto "github.com/timoteoBone/project-microservice/grpcService/pkg/pb"
+	proto "github.com/timoteoBone/microservice-project/grpcService/pkg/pb"
 	"google.golang.org/grpc"
 )
 
@@ -42,18 +42,37 @@ func (repo *grpcClient) CreateUser(ctx context.Context, rq entities.CreateUserRe
 
 func (repo *grpcClient) GetUser(ctx context.Context, rq entities.GetUserRequest) (entities.GetUserResponse, error) {
 	logger := log.With(repo.logger, "get user request", "received")
-
 	client := proto.NewUserServiceClient(repo.server)
-
 	protoReq := util.GetToProto(rq)
 
 	protoRes, err := client.GetUser(ctx, protoReq)
+
 	if err != nil {
-		level.Error(logger).Log("error", err.Error())
+
+		level.Error(logger).Log(err)
 		return entities.GetUserResponse{}, err
 	}
 
 	resp := util.GetFromProto(protoRes)
 
 	return resp, nil
+}
+
+func (repo *grpcClient) DeleteUser(ctx context.Context, rq entities.DeleteUserRequest) (entities.DeleteUserResponse, error) {
+	logger := log.With(repo.logger, "delete user request", "received")
+
+	client := proto.NewUserServiceClient(repo.server)
+
+	protoReq := util.DeleteToProto(rq)
+
+	resp, err := client.DeleteUser(ctx, protoReq)
+	if err != nil {
+		level.Error(logger).Log(err)
+		return entities.DeleteUserResponse{}, err
+	}
+
+	ret := util.DeleteFromProto(resp)
+
+	return ret, nil
+
 }

@@ -7,10 +7,10 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/stretchr/testify/assert"
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	errors "github.com/timoteoBone/project-microservice/grpcService/pkg/errors"
-	"github.com/timoteoBone/project-microservice/httpService/pkg/user"
-	util "github.com/timoteoBone/project-microservice/httpService/pkg/utils"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	errors "github.com/timoteoBone/microservice-project/grpcService/pkg/errors"
+	"github.com/timoteoBone/microservice-project/httpService/pkg/user"
+	util "github.com/timoteoBone/microservice-project/httpService/pkg/utils"
 )
 
 func TestNewService(t *testing.T) {
@@ -180,5 +180,64 @@ func TestGetNonExistingUser(t *testing.T) {
 		assert.ErrorIs(t, err, newErr)
 
 	})
+
+}
+
+func TestDeleteExistingUser(t *testing.T) {
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewSyncLogger(logger)
+		logger = log.With(logger,
+			"service", "grpcUserService",
+			"time:", log.DefaultTimestampUTC,
+			"caller", log.DefaultCaller,
+		)
+	}
+
+	ctx := context.Background()
+
+	correctDeleteUserReq := entities.DeleteUserRequest{
+		UserId: "1234567abcd",
+	}
+
+	testCases := []struct {
+		Name           string
+		Identifier     string
+		buildRepo      func(mock util.RepositoryMock)
+		assertResponse func(t *testing.T, resp entities.DeleteUserResponse, err error)
+	}{
+		{
+			Name:       "Delete Existing User",
+			Identifier: "DeleteUser",
+			buildRepo: func(mock util.RepositoryMock) {
+				mock.On("DeleteUser", ctx, correctDeleteUserReq).Return(entities.DeleteUserResponse{
+					Status: entities.Status{
+						Message: "User deleted succesfully",
+						Code:    0,
+					},
+				}, nil)
+			},
+			assertResponse: func(t *testing.T, resp entities.DeleteUserResponse, err error) {
+				assert.Equal(t, "User deleted succesfully", resp.Status.Message)
+				assert.Equal(t, 0, resp.Status.Code)
+				assert.Nil(t, err)
+			},
+		},
+	}
+
+	repo := util.NewRepositoryMock()
+
+	srvc := user.NewService(&repo, logger)
+
+	for _, tc := range testCases {
+		t.Run(tc.Name, func(t *testing.T) {
+			tc.buildRepo(repo)
+
+			resp, err := srvc.DeleteUser(ctx, correctDeleteUserReq)
+			tc.assertResponse(t, resp, err)
+
+		})
+	}
 
 }

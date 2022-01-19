@@ -31,6 +31,7 @@ func MakeCreateUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 
 		req := request.(entities.CreateUserRequest)
+
 		c, err := s.CreateUser(ctx, req)
 		if err != nil {
 			return nil, err
@@ -43,12 +44,12 @@ func MakeCreateUserEndpoint(s Service) endpoint.Endpoint {
 
 func MakeGetUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-
 		req := request.(entities.GetUserRequest)
 		c, err := s.GetUser(ctx, req)
 		if err != nil {
 			return nil, err
 		}
+
 		return c, nil
 
 	}
@@ -60,8 +61,10 @@ func MakeDeleteUserEndpoint(s Service) endpoint.Endpoint {
 		req := request.(entities.DeleteUserRequest)
 		c, err := s.DeleteUser(ctx, req)
 		if err != nil {
+
 			return nil, err
 		}
+
 		return c, nil
 
 	}

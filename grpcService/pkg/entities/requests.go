@@ -22,11 +22,10 @@ type GetUserRequest struct {
 }
 
 type GetUserResponse struct {
-	Name   string
-	Id     string
-	Age    uint32
-	Email  string
-	Status Status
+	Name  string
+	Id    string
+	Age   uint32
+	Email string
 }
 
 type AuthenticateRequest struct {

@@ -1,8 +1,8 @@
 package util
 
 import (
-	"github.com/timoteoBone/project-microservice/grpcService/pkg/entities"
-	proto "github.com/timoteoBone/project-microservice/grpcService/pkg/pb"
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+	proto "github.com/timoteoBone/microservice-project/grpcService/pkg/pb"
 )
 
 func CreateToProto(req entities.CreateUserRequest) *proto.CreateUserRequest {
@@ -35,6 +35,17 @@ func GetFromProto(resp *proto.GetUserResponse) entities.GetUserResponse {
 		Id:    resp.Id,
 		Age:   resp.Age,
 		Email: resp.Email,
+	}
+}
+
+func DeleteToProto(req entities.DeleteUserRequest) *proto.DeleteUserRequest {
+	return &proto.DeleteUserRequest{
+		User_Id: req.UserId,
+	}
+}
+
+func DeleteFromProto(resp *proto.DeleteUserResponse) entities.DeleteUserResponse {
+	return entities.DeleteUserResponse{
 		Status: entities.Status{
 			Message: resp.Status.Message,
 			Code:    resp.Status.Code,
