@@ -60,6 +60,7 @@ func (s *service) GetUser(ctx context.Context, rq entities.GetUserRequest) (enti
 
 	res, err := s.Repo.GetUser(ctx, rq)
 	if err != nil {
+
 		level.Error(logger).Log(err)
 		return entities.GetUserResponse{}, err
 	}

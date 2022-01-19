@@ -35,10 +35,6 @@ func GetFromProto(resp *proto.GetUserResponse) entities.GetUserResponse {
 		Id:    resp.Id,
 		Age:   resp.Age,
 		Email: resp.Email,
-		Status: entities.Status{
-			Message: resp.Status.Message,
-			Code:    resp.Status.Code,
-		},
 	}
 }
 

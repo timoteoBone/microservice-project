@@ -73,7 +73,6 @@ func decodeGetUserReq(ctx context.Context, r *http.Request) (interface{}, error)
 }
 
 func encodeGetUserResp(ctx context.Context, wr http.ResponseWriter, response interface{}) error {
-
 	return json.NewEncoder(wr).Encode(response)
 }
 
