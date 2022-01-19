@@ -3,7 +3,6 @@ package user_test
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"os"
 	"testing"
 
@@ -114,10 +113,10 @@ func TestServiceCreateExistingUser(t *testing.T) {
 
 	t.Run("Create User Valid case", func(t *testing.T) {
 		ctx := context.Background()
-		repo.On("CreateUser", ctx, user).Return(userId, errors.New("Error 1062: Duplicate entry '' for key 'USER.email'"))
+		repo.On("CreateUser", ctx, user).Return(userId, myErr.NewDataBaseError())
 
 		res, err := srvc.CreateUser(ctx, correctCreateUserRequest)
-		assert.Equal(t, err.Error(), myErr.NewUserAlreadyExists().Error())
+		assert.Equal(t, err.Error(), myErr.NewDataBaseError().Error())
 		assert.Empty(t, res)
 
 	})

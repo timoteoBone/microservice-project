@@ -5,6 +5,8 @@ import (
 
 	"database/sql"
 
+	"github.com/go-sql-driver/mysql"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/google/uuid"
@@ -40,8 +42,11 @@ func (s *service) CreateUser(ctx context.Context, userReq entities.CreateUserReq
 	genId, err := s.Repo.CreateUser(ctx, user, newId)
 
 	if err != nil {
-		if err.Error() == "Error 1062: Duplicate entry '' for key 'USER.email'" {
-			return entities.CreateUserResponse{}, errors.NewUserAlreadyExists()
+		if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+			if mysqlErr.Number == 1062 {
+				level.Error(s.Logger).Log(err)
+				return entities.CreateUserResponse{}, errors.NewUserAlreadyExists()
+			}
 		}
 		level.Error(s.Logger).Log("error", err)
 		return entities.CreateUserResponse{}, errors.NewDataBaseError()
