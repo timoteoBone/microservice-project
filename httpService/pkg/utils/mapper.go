@@ -41,3 +41,18 @@ func GetFromProto(resp *proto.GetUserResponse) entities.GetUserResponse {
 		},
 	}
 }
+
+func DeleteToProto(req entities.DeleteUserRequest) *proto.DeleteUserRequest {
+	return &proto.DeleteUserRequest{
+		User_Id: req.UserId,
+	}
+}
+
+func DeleteFromProto(resp *proto.DeleteUserResponse) entities.DeleteUserResponse {
+	return entities.DeleteUserResponse{
+		Status: entities.Status{
+			Message: resp.Status.Message,
+			Code:    resp.Status.Code,
+		},
+	}
+}

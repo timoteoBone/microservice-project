@@ -25,25 +25,24 @@ func NewService(repo Repository, logger log.Logger) *service {
 }
 
 func (s *service) CreateUser(ctx context.Context, rq entities.CreateUserRequest) (entities.CreateUserResponse, error) {
-
 	logger := log.With(s.Logger, "create user request", "recevied")
 
 	err := util.ValidateCreateUserRequest(rq)
 	if err != nil {
-		level.Error(logger).Log("error", err)
+		level.Error(logger).Log(err)
 		return entities.CreateUserResponse{}, err
 	}
 
 	rq.Pass, err = util.HashPassword(rq.Pass)
 	if err != nil {
-		level.Error(logger).Log("error", err)
+		level.Error(logger).Log(err)
 		return entities.CreateUserResponse{}, err
 	}
 
 	res, err := s.Repo.CreateUser(ctx, rq)
 
 	if err != nil {
-		level.Error(logger).Log("error", err)
+		level.Error(logger).Log(err)
 		return entities.CreateUserResponse{}, err
 	}
 
@@ -53,14 +52,15 @@ func (s *service) CreateUser(ctx context.Context, rq entities.CreateUserRequest)
 
 func (s *service) GetUser(ctx context.Context, rq entities.GetUserRequest) (entities.GetUserResponse, error) {
 	logger := log.With(s.Logger, "get user request", "recevied")
+
 	if err := util.ValidateGetUserRequest(rq); err != nil {
-		level.Error(logger).Log("error", err)
+		level.Error(logger).Log(err)
 		return entities.GetUserResponse{}, err
 	}
 
 	res, err := s.Repo.GetUser(ctx, rq)
 	if err != nil {
-		level.Error(logger).Log("error", err)
+		level.Error(logger).Log(err)
 		return entities.GetUserResponse{}, err
 	}
 
