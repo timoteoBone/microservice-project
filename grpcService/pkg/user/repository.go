@@ -63,7 +63,7 @@ func (repo *sqlRepo) GetUser(ctx context.Context, userId string) (entities.User,
 }
 
 func (repo *sqlRepo) DeleteUser(ctx context.Context, userId string) error {
-	repo.Logger.Log(repo.Logger, "Repository method", "Create user")
+	repo.Logger.Log(repo.Logger, "Repository method", "delete user")
 
 	stmt, err := repo.DB.PrepareContext(ctx, utils.DeleteUserQuery)
 	if err != nil {
