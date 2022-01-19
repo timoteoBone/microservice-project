@@ -14,6 +14,7 @@ type gRPCSv struct {
 	createUs gr.Handler
 	getUs    gr.Handler
 	deleteUs gr.Handler
+	updateUs gr.Handler
 	proto.UnimplementedUserServiceServer
 }
 
@@ -36,6 +37,12 @@ func NewGrpcServer(end Endpoints) proto.UserServiceServer {
 			end.DeleteUser,
 			decodeDeleteUserRequest,
 			encodeDeleteUserRequest,
+		),
+
+		updateUs: gr.NewServer(
+			end.GetUser,
+			decodeUpdateUserRequest,
+			encodeUpdateUserResponse,
 		),
 	}
 }
@@ -68,6 +75,16 @@ func (g *gRPCSv) DeleteUser(ctx context.Context, rq *proto.DeleteUserRequest) (*
 	}
 
 	return resp.(*proto.DeleteUserResponse), nil
+}
+
+func (g *gRPCSv) UpdateUser(ctx context.Context, rq *proto.UpdateUserRequest) (*proto.UpdateUserResponse, error) {
+	_, resp, err := g.updateUs.ServeGRPC(ctx, rq)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*proto.UpdateUserResponse), nil
 }
 
 func decodeCreateUserRequest(ctx context.Context, request interface{}) (interface{}, error) {
@@ -129,5 +146,31 @@ func decodeDeleteUserRequest(ctx context.Context, request interface{}) (interfac
 func encodeDeleteUserRequest(ctx context.Context, response interface{}) (interface{}, error) {
 	resp := response.(entities.DeleteUserResponse)
 	protoResp := &proto.DeleteUserResponse{Status: &proto.Status{Message: resp.Status.Message, Code: resp.Status.Code}}
+	return protoResp, nil
+}
+
+func decodeUpdateUserRequest(ctx context.Context, request interface{}) (interface{}, error) {
+	req, valid := request.(*proto.UpdateUserRequest)
+	if !valid {
+		return nil, customErr.NewGrpcError()
+	}
+
+	return entities.UpdateUserRequest{
+		Name:  req.Name,
+		Pass:  req.Pass,
+		Age:   req.Age,
+		Email: req.Email,
+	}, nil
+}
+
+func encodeUpdateUserResponse(ctx context.Context, response interface{}) (interface{}, error) {
+	resp := response.(entities.UpdateUserResponse)
+	protoResp := &proto.UpdateUserResponse{
+		Status: &proto.Status{
+			Message: resp.Status.Message,
+			Code:    resp.Status.Code,
+		},
+	}
+
 	return protoResp, nil
 }

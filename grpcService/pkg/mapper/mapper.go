@@ -12,3 +12,9 @@ func CreateUserRequestToUser(userReq entities.CreateUserRequest) entities.User {
 	}
 	return user
 }
+
+/*
+func UpdateUserToMap(user entities.UpdateUserRequest) map[string]interface{} {
+
+}
+*/

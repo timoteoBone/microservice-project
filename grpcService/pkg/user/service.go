@@ -104,6 +104,10 @@ func (s *service) DeleteUser(ctx context.Context, rq entities.DeleteUserRequest)
 	}, nil
 }
 
+func (s *service) UpdateUser(ctx context.Context, rq entities.UpdateUserRequest) (entities.UpdateUserResponse, error) {
+	return entities.UpdateUserResponse{}, nil
+}
+
 func generateId() string {
 	return uuid.NewString()
 }

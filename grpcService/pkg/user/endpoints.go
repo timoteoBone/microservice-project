@@ -11,12 +11,14 @@ type Service interface {
 	GetUser(ctx context.Context, userReq entities.GetUserRequest) (entities.GetUserResponse, error)
 	CreateUser(ctx context.Context, userReq entities.CreateUserRequest) (entities.CreateUserResponse, error)
 	DeleteUser(ctx context.Context, userReq entities.DeleteUserRequest) (entities.DeleteUserResponse, error)
+	UpdateUser(ctx context.Context, userReq entities.UpdateUserRequest) (entities.UpdateUserResponse, error)
 }
 
 type Endpoints struct {
 	CreateUser endpoint.Endpoint
 	GetUser    endpoint.Endpoint
 	DeleteUser endpoint.Endpoint
+	UpdateUser endpoint.Endpoint
 }
 
 func MakeEndpoint(s Service) Endpoints {
@@ -24,6 +26,7 @@ func MakeEndpoint(s Service) Endpoints {
 		CreateUser: MakeCreateUserEndpoint(s),
 		GetUser:    MakeGetUserEndpoint(s),
 		DeleteUser: MakeDeleteUserEndpoint(s),
+		UpdateUser: MakeUpdateUserEndpoint(s),
 	}
 }
 
@@ -60,6 +63,21 @@ func MakeDeleteUserEndpoint(s Service) endpoint.Endpoint {
 
 		req := request.(entities.DeleteUserRequest)
 		c, err := s.DeleteUser(ctx, req)
+		if err != nil {
+
+			return nil, err
+		}
+
+		return c, nil
+
+	}
+}
+
+func MakeUpdateUserEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+
+		req := request.(entities.UpdateUserRequest)
+		c, err := s.UpdateUser(ctx, req)
 		if err != nil {
 
 			return nil, err

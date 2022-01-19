@@ -48,8 +48,21 @@ message DeleteUserResponse{
     Status Status = 1;
 }
 
+message UpdateUserRequest{
+    string Name = 1;
+    string Pass = 3;
+    uint32 Age = 4;
+    string Email = 5;
+}
+
+message UpdateUserResponse{
+    Status Status = 1;
+}
+
+
 service UserService{
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse){}
     rpc GetUser(GetUserRequest) returns (GetUserResponse){}
     rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse){}
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse){}
 }
