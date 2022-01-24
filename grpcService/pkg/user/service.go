@@ -20,6 +20,7 @@ type Repository interface {
 	GetUser(ctx context.Context, userId string) (entities.User, error)
 	CreateUser(ctx context.Context, user entities.User, newId string) (string, error)
 	DeleteUser(ctx context.Context, userId string) error
+	UpdateUser(ctx context.Context, user entities.User, id string) error
 }
 
 type service struct {
@@ -32,7 +33,7 @@ func NewService(l log.Logger, r Repository) *service {
 }
 
 func (s *service) CreateUser(ctx context.Context, userReq entities.CreateUserRequest) (entities.CreateUserResponse, error) {
-	s.Logger.Log(s.Logger, "request", "create user", "received")
+	logger := log.With(s.Logger, "request", "create user", "received")
 
 	response := entities.CreateUserResponse{}
 	status := entities.Status{}
@@ -44,11 +45,11 @@ func (s *service) CreateUser(ctx context.Context, userReq entities.CreateUserReq
 	if err != nil {
 		if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 			if mysqlErr.Number == 1062 {
-				level.Error(s.Logger).Log(err)
+				level.Error(logger).Log(err)
 				return entities.CreateUserResponse{}, errors.NewUserAlreadyExists()
 			}
 		}
-		level.Error(s.Logger).Log("error", err)
+		level.Error(logger).Log(err)
 		return entities.CreateUserResponse{}, errors.NewDataBaseError()
 	}
 
@@ -60,15 +61,15 @@ func (s *service) CreateUser(ctx context.Context, userReq entities.CreateUserReq
 }
 
 func (s *service) GetUser(ctx context.Context, user entities.GetUserRequest) (entities.GetUserResponse, error) {
-	s.Logger.Log(s.Logger, "request", "get user", "received")
+	logger := log.With(s.Logger, "request", "get user", "received")
 
 	res, err := s.Repo.GetUser(ctx, user.UserID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			level.Error(s.Logger).Log("error", err)
+			level.Error(logger).Log(err)
 			return entities.GetUserResponse{}, errors.NewUserNotFound()
 		}
-		level.Error(s.Logger).Log("error", err)
+		level.Error(logger).Log(err)
 		return entities.GetUserResponse{}, errors.NewDataBaseError()
 	}
 
@@ -82,17 +83,17 @@ func (s *service) GetUser(ctx context.Context, user entities.GetUserRequest) (en
 }
 
 func (s *service) DeleteUser(ctx context.Context, rq entities.DeleteUserRequest) (entities.DeleteUserResponse, error) {
-	s.Logger.Log(s.Logger, "delete user", "recevied")
+	logger := log.With(s.Logger, "delete user", "recevied")
 
 	userId := rq.UserId
 
 	err := s.Repo.DeleteUser(ctx, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			level.Error(s.Logger).Log("error", err)
+			level.Error(logger).Log(err)
 			return entities.DeleteUserResponse{}, errors.NewUserNotFound()
 		}
-		level.Error(s.Logger).Log("error", err)
+		level.Error(logger).Log(err)
 		return entities.DeleteUserResponse{}, errors.NewDataBaseError()
 	}
 
@@ -105,7 +106,28 @@ func (s *service) DeleteUser(ctx context.Context, rq entities.DeleteUserRequest)
 }
 
 func (s *service) UpdateUser(ctx context.Context, rq entities.UpdateUserRequest) (entities.UpdateUserResponse, error) {
-	return entities.UpdateUserResponse{}, nil
+	logger := log.With(s.Logger, "update user request", "received")
+
+	userData := mapper.UpdateUserToUser(rq)
+	userID := rq.Id
+
+	err := s.Repo.UpdateUser(ctx, userData, userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			level.Error(logger).Log(err)
+			return entities.UpdateUserResponse{}, errors.NewUserNotFound()
+		}
+		level.Error(logger).Log(err)
+		return entities.UpdateUserResponse{}, errors.NewDataBaseError()
+	}
+
+	return entities.UpdateUserResponse{
+		Status: entities.Status{
+			Message: "User updated succesfully",
+			Code:    0,
+		},
+	}, nil
+
 }
 
 func generateId() string {

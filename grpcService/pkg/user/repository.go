@@ -82,3 +82,24 @@ func (repo *sqlRepo) DeleteUser(ctx context.Context, userId string) error {
 	return nil
 
 }
+
+func (repo *sqlRepo) UpdateUser(ctx context.Context, user entities.User, userId string) error {
+	logger := log.With(repo.Logger, "Repository method", "update user")
+
+	stmt, err := repo.DB.PrepareContext(ctx, utils.UpdateUserQuery)
+	if err != nil {
+		level.Error(logger).Log(err)
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, user.Name, user.Pass, user.Age, user.Email, userId)
+	if err != nil {
+		level.Error(logger).Log(err)
+		return err
+	}
+
+	return nil
+
+}

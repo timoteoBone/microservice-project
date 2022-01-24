@@ -1,6 +1,8 @@
 package mapper
 
-import "github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+import (
+	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
+)
 
 func CreateUserRequestToUser(userReq entities.CreateUserRequest) entities.User {
 
@@ -13,8 +15,11 @@ func CreateUserRequestToUser(userReq entities.CreateUserRequest) entities.User {
 	return user
 }
 
-/*
-func UpdateUserToMap(user entities.UpdateUserRequest) map[string]interface{} {
-
+func UpdateUserToUser(userData entities.UpdateUserRequest) entities.User {
+	return entities.User{
+		Name:  userData.Name,
+		Pass:  userData.Pass,
+		Age:   userData.Age,
+		Email: userData.Email,
+	}
 }
-*/

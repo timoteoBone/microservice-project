@@ -50,6 +50,7 @@ type UpdateUserRequest struct {
 	Pass  string
 	Age   uint32
 	Email string
+	Id    string
 }
 
 type UpdateUserResponse struct {

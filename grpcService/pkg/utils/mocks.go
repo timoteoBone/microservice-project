@@ -49,6 +49,8 @@ func (repo *RepoSitoryMock) DeleteUser(ctx context.Context, userId string) error
 	return args.Error(0)
 }
 
-func (repo *RepoSitoryMock) AuthenticateUser(ctx context.Context, email string) (string, error) {
-	return "nil", nil
+func (repo *RepoSitoryMock) UpdateUser(ctx context.Context, user entities.User, userId string) error {
+	args := repo.Called(ctx, user, userId)
+
+	return args.Error(0)
 }

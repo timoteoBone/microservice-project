@@ -53,6 +53,7 @@ message UpdateUserRequest{
     string Pass = 3;
     uint32 Age = 4;
     string Email = 5;
+    string Id = 6;
 }
 
 message UpdateUserResponse{

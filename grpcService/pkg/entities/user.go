@@ -6,3 +6,12 @@ type User struct {
 	Age   uint32
 	Email string
 }
+
+var (
+	FieldsReferenceSql = map[string]string{
+		"Name":  "first_name",
+		"Pass":  "pass",
+		"Age":   "age",
+		"Email": "email",
+	}
+)

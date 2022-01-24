@@ -267,6 +267,87 @@ func TestDeleteNonExistingUser(t *testing.T) {
 
 }
 
-func TestAuthenticateUser(t *testing.T) {
+func TestUpdateExistingUser(t *testing.T) {
+
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewSyncLogger(logger)
+		logger = log.With(logger,
+			"service", "grpcUserService",
+			"time:", log.DefaultTimestampUTC,
+			"caller", log.DefaultCaller,
+		)
+	}
+
+	userId := utils.GenerateId()
+
+	userMock := entities.User{
+		Name:  "Timo",
+		Pass:  "123",
+		Age:   20,
+		Email: "timoteo@globant.com",
+	}
+
+	updateUserRequest := entities.UpdateUserRequest{
+		Name:  "Timo",
+		Pass:  "123",
+		Age:   20,
+		Email: "timoteo@globant.com",
+		Id:    userId,
+	}
+
+	repo := new(utils.RepoSitoryMock)
+	srvc := service.NewService(logger, repo)
+
+	ctx := context.Background()
+	repo.Mock.On("UpdateUser", ctx, userMock, userId).Return(nil)
+
+	res, err := srvc.UpdateUser(ctx, updateUserRequest)
+	assert.Equal(t, "User updated succesfully", res.Status.Message)
+	assert.Equal(t, int32(0), res.Status.Code)
+	assert.Nil(t, err)
+
+}
+
+func TestUpdateNonExistingUser(t *testing.T) {
+
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewSyncLogger(logger)
+		logger = log.With(logger,
+			"service", "grpcUserService",
+			"time:", log.DefaultTimestampUTC,
+			"caller", log.DefaultCaller,
+		)
+	}
+
+	userId := utils.GenerateId()
+
+	userMock := entities.User{
+		Name:  "Timo",
+		Pass:  "123",
+		Age:   20,
+		Email: "timoteo@globant.com",
+	}
+
+	updateUserRequest := entities.UpdateUserRequest{
+		Name:  "Timo",
+		Pass:  "123",
+		Age:   20,
+		Email: "timoteo@globant.com",
+		Id:    userId,
+	}
+
+	repo := new(utils.RepoSitoryMock)
+	srvc := service.NewService(logger, repo)
+
+	ctx := context.Background()
+	repo.Mock.On("UpdateUser", ctx, userMock, userId).Return(sql.ErrNoRows)
+
+	res, err := srvc.UpdateUser(ctx, updateUserRequest)
+	assert.Equal(t, entities.UpdateUserResponse{}, res)
+	assert.NotNil(t, err)
 
 }
