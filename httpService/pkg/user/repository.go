@@ -6,7 +6,7 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
-	util "github.com/timoteoBone/microservice-project/httpService/pkg/utils"
+	mapper "github.com/timoteoBone/microservice-project/httpService/pkg/mapper"
 
 	proto "github.com/timoteoBone/microservice-project/grpcService/pkg/pb"
 	"google.golang.org/grpc"
@@ -26,7 +26,7 @@ func (repo *grpcClient) CreateUser(ctx context.Context, rq entities.CreateUserRe
 
 	client := proto.NewUserServiceClient(repo.server)
 
-	protoReq := util.CreateToProto(rq)
+	protoReq := mapper.CreateToProto(rq)
 
 	resp, err := client.CreateUser(ctx, protoReq)
 	if err != nil {
@@ -34,7 +34,7 @@ func (repo *grpcClient) CreateUser(ctx context.Context, rq entities.CreateUserRe
 		return entities.CreateUserResponse{}, err
 	}
 
-	res := util.CreateFromProto(resp)
+	res := mapper.CreateFromProto(resp)
 
 	return res, nil
 
@@ -43,7 +43,7 @@ func (repo *grpcClient) CreateUser(ctx context.Context, rq entities.CreateUserRe
 func (repo *grpcClient) GetUser(ctx context.Context, rq entities.GetUserRequest) (entities.GetUserResponse, error) {
 	logger := log.With(repo.logger, "get user request", "received")
 	client := proto.NewUserServiceClient(repo.server)
-	protoReq := util.GetToProto(rq)
+	protoReq := mapper.GetToProto(rq)
 
 	protoRes, err := client.GetUser(ctx, protoReq)
 
@@ -53,7 +53,7 @@ func (repo *grpcClient) GetUser(ctx context.Context, rq entities.GetUserRequest)
 		return entities.GetUserResponse{}, err
 	}
 
-	resp := util.GetFromProto(protoRes)
+	resp := mapper.GetFromProto(protoRes)
 
 	return resp, nil
 }
@@ -63,7 +63,7 @@ func (repo *grpcClient) DeleteUser(ctx context.Context, rq entities.DeleteUserRe
 
 	client := proto.NewUserServiceClient(repo.server)
 
-	protoReq := util.DeleteToProto(rq)
+	protoReq := mapper.DeleteToProto(rq)
 
 	resp, err := client.DeleteUser(ctx, protoReq)
 	if err != nil {
@@ -71,8 +71,27 @@ func (repo *grpcClient) DeleteUser(ctx context.Context, rq entities.DeleteUserRe
 		return entities.DeleteUserResponse{}, err
 	}
 
-	ret := util.DeleteFromProto(resp)
+	ret := mapper.DeleteFromProto(resp)
 
 	return ret, nil
+
+}
+
+func (repo *grpcClient) UpdateUser(ctx context.Context, rq entities.UpdateUserRequest) (entities.UpdateUserResponse, error) {
+	logger := log.With(repo.logger, "update user request", "received")
+
+	client := proto.NewUserServiceClient(repo.server)
+
+	protoReq := mapper.UpdateToProto(rq)
+
+	protoResp, err := client.UpdateUser(ctx, protoReq)
+	if err != nil {
+		level.Error(logger).Log(err)
+		return entities.UpdateUserResponse{}, err
+	}
+
+	resp := mapper.UpdateFromProto(protoResp)
+
+	return resp, nil
 
 }

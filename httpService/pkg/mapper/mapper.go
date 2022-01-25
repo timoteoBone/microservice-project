@@ -52,3 +52,22 @@ func DeleteFromProto(resp *proto.DeleteUserResponse) entities.DeleteUserResponse
 		},
 	}
 }
+
+func UpdateToProto(req entities.UpdateUserRequest) *proto.UpdateUserRequest {
+	return &proto.UpdateUserRequest{
+		Name:  req.Name,
+		Pass:  req.Pass,
+		Age:   req.Age,
+		Email: req.Email,
+		Id:    req.Id,
+	}
+}
+
+func UpdateFromProto(resp *proto.UpdateUserResponse) entities.UpdateUserResponse {
+	return entities.UpdateUserResponse{
+		Status: entities.Status{
+			Message: resp.Status.Message,
+			Code:    resp.Status.Code,
+		},
+	}
+}

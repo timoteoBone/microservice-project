@@ -34,7 +34,7 @@ func TestNewService(t *testing.T) {
 
 }
 
-func TestCreateUser(t *testing.T) {
+func TestCreateValidUser(t *testing.T) {
 	var logger log.Logger
 	{
 		logger = log.NewLogfmtLogger(os.Stderr)
@@ -65,7 +65,7 @@ func TestCreateUser(t *testing.T) {
 
 	t.Run("Create User Valid Case", func(t *testing.T) {
 		ctx := context.Background()
-		repo.On("CreateUser", ctx, correctCreateRequest).Return(correctCreateResponse, nil)
+		repo.On("CreateUser", ctx, entities.CreateUserRequest{}).Return(correctCreateResponse, nil)
 
 		res, err := srvc.CreateUser(ctx, correctCreateRequest)
 		assert.ErrorIs(t, err, nil)
@@ -100,7 +100,7 @@ func TestCreateUserEmptyFields(t *testing.T) {
 		ctx := context.Background()
 
 		res, err := srvc.CreateUser(ctx, correctCreateRequest)
-		assert.Equal(t, err.Error(), errors.NewFieldsMissing().Error())
+		assert.Equal(t, err.Error(), errors.NewBadRequest().Error())
 		assert.Empty(t, res)
 	})
 
@@ -195,49 +195,149 @@ func TestDeleteExistingUser(t *testing.T) {
 		)
 	}
 
-	ctx := context.Background()
+	var (
+		correctDeleteUserReq = entities.DeleteUserRequest{
+			UserId: "1234567abcd",
+		}
 
-	correctDeleteUserReq := entities.DeleteUserRequest{
-		UserId: "1234567abcd",
-	}
-
-	testCases := []struct {
-		Name           string
-		Identifier     string
-		buildRepo      func(mock util.RepositoryMock)
-		assertResponse func(t *testing.T, resp entities.DeleteUserResponse, err error)
-	}{
-		{
-			Name:       "Delete Existing User",
-			Identifier: "DeleteUser",
-			buildRepo: func(mock util.RepositoryMock) {
-				mock.On("DeleteUser", ctx, correctDeleteUserReq).Return(entities.DeleteUserResponse{
-					Status: entities.Status{
-						Message: "User deleted succesfully",
-						Code:    0,
-					},
-				}, nil)
+		correctDeleteUserResponse = entities.DeleteUserResponse{
+			Status: entities.Status{
+				Message: "User deleted succesfully",
+				Code:    0,
 			},
-			assertResponse: func(t *testing.T, resp entities.DeleteUserResponse, err error) {
-				assert.Equal(t, "User deleted succesfully", resp.Status.Message)
-				assert.Equal(t, 0, resp.Status.Code)
-				assert.Nil(t, err)
-			},
-		},
-	}
+		}
+	)
 
 	repo := util.NewRepositoryMock()
 
 	srvc := user.NewService(&repo, logger)
 
-	for _, tc := range testCases {
-		t.Run(tc.Name, func(t *testing.T) {
-			tc.buildRepo(repo)
+	t.Run("Delete Existing User", func(t *testing.T) {
+		ctx := context.Background()
+		repo.On("DeleteUser", ctx, correctDeleteUserReq).Return(correctDeleteUserResponse, nil)
 
-			resp, err := srvc.DeleteUser(ctx, correctDeleteUserReq)
-			tc.assertResponse(t, resp, err)
+		res, err := srvc.DeleteUser(ctx, correctDeleteUserReq)
+		assert.Equal(t, correctDeleteUserResponse, res)
+		assert.Nil(t, err)
 
-		})
+	})
+
+}
+
+func TestDeleteNonExistingUser(t *testing.T) {
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewSyncLogger(logger)
+		logger = log.With(logger,
+			"service", "grpcUserService",
+			"time:", log.DefaultTimestampUTC,
+			"caller", log.DefaultCaller,
+		)
 	}
+
+	var (
+		correctDeleteUserReq = entities.DeleteUserRequest{
+			UserId: "1234567abcd",
+		}
+	)
+
+	newErr := errors.NewUserNotFound()
+
+	repo := util.NewRepositoryMock()
+
+	srvc := user.NewService(&repo, logger)
+
+	t.Run("Delete Existing User", func(t *testing.T) {
+		ctx := context.Background()
+		repo.On("DeleteUser", ctx, correctDeleteUserReq).Return(entities.DeleteUserResponse{}, newErr)
+
+		res, err := srvc.DeleteUser(ctx, correctDeleteUserReq)
+		assert.Empty(t, res)
+		assert.Equal(t, newErr, err)
+
+	})
+
+}
+
+func TestUpdateExistingUser(t *testing.T) {
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewSyncLogger(logger)
+		logger = log.With(logger,
+			"service", "grpcUserService",
+			"time:", log.DefaultTimestampUTC,
+			"caller", log.DefaultCaller,
+		)
+	}
+
+	var (
+		correctUpdateRequest entities.UpdateUserRequest = entities.UpdateUserRequest{
+			Name:  "Timo",
+			Age:   19,
+			Pass:  "123",
+			Email: "timoteo@globant.com",
+		}
+
+		correctUpdateResponse entities.UpdateUserResponse = entities.UpdateUserResponse{
+			Status: entities.Status{Message: "User updated succesfully", Code: 0},
+		}
+	)
+
+	newErr := errors.NewUserNotFound()
+
+	repo := util.NewRepositoryMock()
+
+	srvc := user.NewService(&repo, logger)
+
+	t.Run("Update Existing User", func(t *testing.T) {
+		ctx := context.Background()
+		repo.On("UpdateUser", ctx, correctUpdateRequest).Return(correctUpdateResponse, nil)
+
+		res, err := srvc.UpdateUser(ctx, correctUpdateRequest)
+		assert.Empty(t, res)
+		assert.Equal(t, newErr, err)
+
+	})
+
+}
+
+func TestUpdateNonExistingUser(t *testing.T) {
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewSyncLogger(logger)
+		logger = log.With(logger,
+			"service", "grpcUserService",
+			"time:", log.DefaultTimestampUTC,
+			"caller", log.DefaultCaller,
+		)
+	}
+
+	var (
+		correctUpdateRequest entities.UpdateUserRequest = entities.UpdateUserRequest{
+			Name:  "Timo",
+			Age:   19,
+			Pass:  "123",
+			Email: "timoteo@globant.com",
+		}
+	)
+
+	newErr := errors.NewUserNotFound()
+
+	repo := util.NewRepositoryMock()
+
+	srvc := user.NewService(&repo, logger)
+
+	t.Run("Update Non Existing User", func(t *testing.T) {
+		ctx := context.Background()
+		repo.On("UpdateUser", ctx, correctUpdateRequest).Return(entities.UpdateUserResponse{}, nil)
+
+		res, err := srvc.UpdateUser(ctx, correctUpdateRequest)
+		assert.Empty(t, res)
+		assert.Equal(t, newErr, err)
+
+	})
 
 }
