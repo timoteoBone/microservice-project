@@ -94,10 +94,13 @@ func (repo *sqlRepo) UpdateUser(ctx context.Context, user entities.User, userId 
 
 	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx, user.Name, user.Pass, user.Age, user.Email, userId)
+	rows, err := stmt.ExecContext(ctx, user.Name, user.Pass, user.Age, user.Email, userId)
 	if err != nil {
 		level.Error(logger).Log(err)
 		return err
+	}
+	if insert, _ := rows.RowsAffected(); insert == 0 {
+		return sql.ErrNoRows
 	}
 
 	return nil

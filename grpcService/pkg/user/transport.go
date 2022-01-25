@@ -3,6 +3,9 @@ package user
 import (
 	"context"
 
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/transport"
+	"github.com/go-kit/kit/transport/grpc"
 	gr "github.com/go-kit/kit/transport/grpc"
 
 	"github.com/timoteoBone/microservice-project/grpcService/pkg/entities"
@@ -18,31 +21,40 @@ type gRPCSv struct {
 	proto.UnimplementedUserServiceServer
 }
 
-func NewGrpcServer(end Endpoints) proto.UserServiceServer {
+func NewGrpcServer(end Endpoints, logger log.Logger) proto.UserServiceServer {
+
+	options := []grpc.ServerOption{
+		grpc.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
+	}
 
 	return &gRPCSv{
 		createUs: gr.NewServer(
 			end.CreateUser,
 			decodeCreateUserRequest,
 			encodeCreateUserResponse,
+			options...,
 		),
 
 		getUs: gr.NewServer(
 			end.GetUser,
 			decodeGetUserRequest,
 			encodeGetUserResponse,
+			options...,
 		),
 
 		deleteUs: gr.NewServer(
 			end.DeleteUser,
 			decodeDeleteUserRequest,
 			encodeDeleteUserRequest,
+			options...,
 		),
 
 		updateUs: gr.NewServer(
-			end.GetUser,
+			end.UpdateUser,
 			decodeUpdateUserRequest,
 			encodeUpdateUserResponse,
+
+			options...,
 		),
 	}
 }
@@ -160,6 +172,7 @@ func decodeUpdateUserRequest(ctx context.Context, request interface{}) (interfac
 		Pass:  req.Pass,
 		Age:   req.Age,
 		Email: req.Email,
+		Id:    req.Id,
 	}, nil
 }
 

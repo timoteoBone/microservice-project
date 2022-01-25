@@ -79,7 +79,6 @@ func MakeUpdateUserEndpoint(s Service) endpoint.Endpoint {
 		req := request.(entities.UpdateUserRequest)
 		c, err := s.UpdateUser(ctx, req)
 		if err != nil {
-
 			return nil, err
 		}
 

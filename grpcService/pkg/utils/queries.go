@@ -13,7 +13,7 @@ var (
 	GetUserQuery     string = "SELECT first_name, age, email FROM USER WHERE id=?"
 	GetPasswordQuery string = "SELECT pass FROM USER WHERE id = ?"
 	DeleteUserQuery  string = "DELETE FROM USER WHERE id = ?"
-	UpdateUserQuery  string = "UPDATE USER SET first_name, pass, age, email WHERE id = ?"
+	UpdateUserQuery  string = "UPDATE USER SET first_name=?, pass=?, age=?, email=? WHERE id = ?"
 )
 
 func GenerateQuery(user entities.User) (string, []interface{}) {

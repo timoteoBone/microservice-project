@@ -57,7 +57,7 @@ func (err UserAlreadyExists) Error() string {
 	return fmt.Sprint(err.err)
 }
 
-func NewFieldsMissing() BadRequest {
+func NewBadRequest() BadRequest {
 	return BadRequest{err: errors.New("all fields are required")}
 }
 
@@ -145,4 +145,23 @@ func CustomToHttp(err error) int {
 		return http.StatusInternalServerError
 	}
 
+}
+
+func GrpcToCustom(code status.Status) error {
+	var err error
+	switch code.Code() {
+	case codes.InvalidArgument:
+		err = NewBadRequest()
+	case codes.NotFound:
+		err = NewUserNotFound()
+	case codes.PermissionDenied:
+		err = NewDeniedAuthentication()
+	case codes.Unknown:
+		err = NewGrpcError()
+	case codes.Aborted:
+		err = NewDataBaseError()
+	case codes.AlreadyExists:
+		err = NewUserAlreadyExists()
+	}
+	return err
 }
