@@ -2,12 +2,14 @@ module github.com/timoteoBone/microservice-project/httpService
 
 go 1.17
 
+replace github.com/timoteoBone/microservice-project/grpcService => ../grpcService
+
 require (
 	github.com/go-kit/kit v0.12.0
 	github.com/go-kit/log v0.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/stretchr/testify v1.7.0
-	github.com/timoteoBone/microservice-project/grpcService v0.0.0-20220118190758-160f5e7f31f4
+	github.com/timoteoBone/microservice-project/grpcService v0.0.0-20220119175432-19cb222d1e3e
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
 	google.golang.org/grpc v1.43.0
 )

@@ -13,7 +13,7 @@ type UserNotFoundErr struct {
 	err error
 }
 
-type FieldsMissingErr struct {
+type BadRequest struct {
 	err error
 }
 
@@ -33,7 +33,7 @@ type UserAlreadyExists struct {
 	err error
 }
 
-func (err FieldsMissingErr) Error() string {
+func (err BadRequest) Error() string {
 	return fmt.Sprint(err.err)
 }
 
@@ -57,8 +57,8 @@ func (err UserAlreadyExists) Error() string {
 	return fmt.Sprint(err.err)
 }
 
-func NewFieldsMissing() FieldsMissingErr {
-	return FieldsMissingErr{err: errors.New("all fields are required")}
+func NewBadRequest() BadRequest {
+	return BadRequest{err: errors.New("all fields are required")}
 }
 
 func NewUserNotFound() UserNotFoundErr {
@@ -97,11 +97,11 @@ func (err DeniedAuthentication) GRPCStatus() *status.Status {
 	return status.New(codes.PermissionDenied, err.Error())
 }
 
-func (err FieldsMissingErr) StatusCode() int {
+func (err BadRequest) StatusCode() int {
 	return http.StatusBadRequest
 }
 
-func (err FieldsMissingErr) GRPCStatus() *status.Status {
+func (err BadRequest) GRPCStatus() *status.Status {
 	return status.New(codes.InvalidArgument, err.Error())
 }
 
@@ -133,7 +133,7 @@ func CustomToHttp(err error) int {
 	switch err.(type) {
 	case UserNotFoundErr:
 		return http.StatusNotFound
-	case FieldsMissingErr:
+	case BadRequest:
 		return http.StatusBadRequest
 	case DeniedAuthentication:
 		return http.StatusUnauthorized
@@ -145,4 +145,23 @@ func CustomToHttp(err error) int {
 		return http.StatusInternalServerError
 	}
 
+}
+
+func GrpcToCustom(code status.Status) error {
+	var err error
+	switch code.Code() {
+	case codes.InvalidArgument:
+		err = NewBadRequest()
+	case codes.NotFound:
+		err = NewUserNotFound()
+	case codes.PermissionDenied:
+		err = NewDeniedAuthentication()
+	case codes.Unknown:
+		err = NewGrpcError()
+	case codes.Aborted:
+		err = NewDataBaseError()
+	case codes.AlreadyExists:
+		err = NewUserAlreadyExists()
+	}
+	return err
 }

@@ -44,3 +44,15 @@ type DeleteUserRequest struct {
 type DeleteUserResponse struct {
 	Status Status
 }
+
+type UpdateUserRequest struct {
+	Name  string
+	Pass  string
+	Age   uint32
+	Email string
+	Id    string
+}
+
+type UpdateUserResponse struct {
+	Status Status
+}

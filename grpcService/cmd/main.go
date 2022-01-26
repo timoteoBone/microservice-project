@@ -48,7 +48,7 @@ func main() {
 	srv := user.NewService(logger, repo)
 
 	end := user.MakeEndpoint(srv)
-	grpcSv := user.NewGrpcServer(end)
+	grpcSv := user.NewGrpcServer(end, logger)
 
 	errs := make(chan error)
 	go func() {
