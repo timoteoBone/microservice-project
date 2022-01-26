@@ -11,7 +11,7 @@ import (
 )
 
 type sqlRepo struct {
-	DB     *sql.DB
+	db     *sql.DB
 	Logger log.Logger
 }
 
@@ -23,7 +23,7 @@ func (repo *sqlRepo) CreateUser(ctx context.Context, user entities.User, newId s
 
 	repo.Logger.Log(repo.Logger, "Repository method", "Create user")
 
-	stmt, err := repo.DB.PrepareContext(ctx, utils.CreateUserQuery)
+	stmt, err := repo.db.PrepareContext(ctx, utils.CreateUserQuery)
 	if err != nil {
 		level.Error(repo.Logger).Log(err)
 		return "", err
@@ -45,7 +45,7 @@ func (repo *sqlRepo) GetUser(ctx context.Context, userId string) (entities.User,
 	repo.Logger.Log(repo.Logger, "Repository method", "Get user")
 
 	user := entities.User{}
-	stmt, err := repo.DB.PrepareContext(ctx, utils.GetUserQuery)
+	stmt, err := repo.db.PrepareContext(ctx, utils.GetUserQuery)
 	if err != nil {
 		level.Error(repo.Logger).Log(err)
 		return entities.User{}, err
@@ -65,7 +65,7 @@ func (repo *sqlRepo) GetUser(ctx context.Context, userId string) (entities.User,
 func (repo *sqlRepo) DeleteUser(ctx context.Context, userId string) error {
 	repo.Logger.Log(repo.Logger, "Repository method", "delete user")
 
-	stmt, err := repo.DB.PrepareContext(ctx, utils.DeleteUserQuery)
+	stmt, err := repo.db.PrepareContext(ctx, utils.DeleteUserQuery)
 	if err != nil {
 		level.Error(repo.Logger).Log(err)
 		return err
@@ -86,7 +86,7 @@ func (repo *sqlRepo) DeleteUser(ctx context.Context, userId string) error {
 func (repo *sqlRepo) UpdateUser(ctx context.Context, user entities.User, userId string) error {
 	logger := log.With(repo.Logger, "Repository method", "update user")
 
-	stmt, err := repo.DB.PrepareContext(ctx, utils.UpdateUserQuery)
+	stmt, err := repo.db.PrepareContext(ctx, utils.UpdateUserQuery)
 	if err != nil {
 		level.Error(logger).Log(err)
 		return err
