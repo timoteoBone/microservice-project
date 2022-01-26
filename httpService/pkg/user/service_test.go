@@ -65,7 +65,7 @@ func TestCreateValidUser(t *testing.T) {
 
 	t.Run("Create User Valid Case", func(t *testing.T) {
 		ctx := context.Background()
-		repo.On("CreateUser", ctx, entities.CreateUserRequest{}).Return(correctCreateResponse, nil)
+		repo.On("CreateUser", ctx, correctCreateRequest).Return(correctCreateResponse, nil)
 
 		res, err := srvc.CreateUser(ctx, correctCreateRequest)
 		assert.ErrorIs(t, err, nil)
